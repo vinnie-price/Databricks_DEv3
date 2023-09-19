@@ -90,16 +90,34 @@
 
 -- COMMAND ----------
 
+select * from events limit 10
+
+-- COMMAND ----------
+
+select user_id, user_first_touch_timestamp, max(event_name) as event_name, count(event_name) as event_count
+from events
+group by user_id, user_first_touch_timestamp
+
+-- COMMAND ----------
+
 -- MAGIC %md ### Solve with SQL
 
 -- COMMAND ----------
 
 -- TODO
-CREATE OR REPLACE VIEW events_pivot
-<FILL_IN>
-("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
-"register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
-"cc_info", "foam", "reviews", "original", "delivery", "premium")
+CREATE OR REPLACE TEMP VIEW events_pivot AS 
+SELECT user_id as user, cart, pillows, login, main, careers, guest, faq, down, warranty, finalize, 
+  register, shipping_info, checkout, mattresses, add_item, press, email_coupon, 
+  cc_info, foam, reviews, original, delivery, premium
+FROM 
+(
+  SELECT user_id, user_first_touch_timestamp, event_name
+  FROM events) AS source
+PIVOT (
+  count(event_name) FOR event_name IN ("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
+  "register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
+  "cc_info", "foam", "reviews", "original", "delivery", "premium")
+)
 
 -- COMMAND ----------
 
@@ -107,11 +125,20 @@ CREATE OR REPLACE VIEW events_pivot
 
 -- COMMAND ----------
 
+
+
+-- COMMAND ----------
+
 -- MAGIC %python
 -- MAGIC # TODO
--- MAGIC (spark.read
--- MAGIC     <FILL_IN>
--- MAGIC     .createOrReplaceTempView("events_pivot"))
+-- MAGIC (spark.read.table('events')
+-- MAGIC   .select('user_id','event_name')
+-- MAGIC   .groupby('user_id')
+-- MAGIC   .pivot('event_name')
+-- MAGIC   .count()
+-- MAGIC   .withColumnRenamed('user_id','user')
+-- MAGIC   .createOrReplaceTempView("events_pivot")
+-- MAGIC     )
 
 -- COMMAND ----------
 
@@ -165,9 +192,21 @@ CREATE OR REPLACE VIEW events_pivot
 
 -- COMMAND ----------
 
+select * from transactions limit 10
+
+-- COMMAND ----------
+
+select *
+from events_pivot
+inner join transactions on events_pivot.user == transactions.user_id
+
+-- COMMAND ----------
+
 -- TODO
-CREATE OR REPLACE VIEW clickpaths AS
-<FILL_IN>
+CREATE OR REPLACE TEMP VIEW clickpaths AS
+select *
+from events_pivot
+inner join transactions on events_pivot.user == transactions.user_id
 
 -- COMMAND ----------
 
@@ -177,9 +216,11 @@ CREATE OR REPLACE VIEW clickpaths AS
 
 -- MAGIC %python
 -- MAGIC # TODO
--- MAGIC (spark.read
--- MAGIC     <FILL_IN>
--- MAGIC     .createOrReplaceTempView("clickpaths"))
+-- MAGIC from pyspark.sql.functions import col
+-- MAGIC (spark.read.table('events_pivot').alias('evt_pvt')
+-- MAGIC     .join(spark.read.table('transactions').alias('trns'), on= col('evt_pvt.user') == col('trns.user_id'))
+-- MAGIC     .createOrReplaceTempView("clickpaths")
+-- MAGIC     )# .display()
 
 -- COMMAND ----------
 

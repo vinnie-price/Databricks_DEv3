@@ -65,6 +65,10 @@ FROM users_dirty
 
 -- COMMAND ----------
 
+SELECT COUNT(*) FROM users_dirty
+
+-- COMMAND ----------
+
 -- MAGIC %md ## Inspect Missing Data
 -- MAGIC
 -- MAGIC Based on the counts above, it looks like there are at least a handful of null values in all of our fields.
@@ -90,8 +94,8 @@ SELECT count(*) FROM users_dirty WHERE email IS NULL;
 -- MAGIC from pyspark.sql.functions import col
 -- MAGIC usersDF = spark.read.table("users_dirty")
 -- MAGIC
--- MAGIC usersDF.selectExpr("count_if(email IS NULL)")
--- MAGIC usersDF.where(col("email").isNull()).count()
+-- MAGIC usersDF.selectExpr("count_if(email IS NULL)").display()
+-- MAGIC #usersDF.where(col("email").isNull()).count()
 
 -- COMMAND ----------
 
@@ -131,6 +135,16 @@ WHERE user_id IS NOT NULL
 GROUP BY user_id, user_first_touch_timestamp;
 
 SELECT count(*) FROM deduped_users
+
+-- COMMAND ----------
+
+SELECT user_id, max(email), user_first_touch_timestamp
+FROM users_dirty
+GROUP BY user_id, user_first_touch_timestamp;
+
+-- COMMAND ----------
+
+SELECT * from deduped_users
 
 -- COMMAND ----------
 
@@ -193,6 +207,10 @@ SELECT max(row_count) <= 1 no_duplicate_ids FROM (
 
 -- COMMAND ----------
 
+
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC
@@ -206,6 +224,14 @@ SELECT max(user_id_count) <= 1 at_most_one_id FROM (
   FROM deduped_users
   WHERE email IS NOT NULL
   GROUP BY email)
+
+-- COMMAND ----------
+
+SELECT email, count(user_id) AS user_id_count
+FROM users_dirty
+WHERE email IS NOT NULL
+GROUP BY email
+
 
 -- COMMAND ----------
 

@@ -55,32 +55,32 @@
 -- COMMAND ----------
 
 CREATE TABLE students
-  (id INT, name STRING, value DOUBLE);
+  (id INT, name STRING, value DOUBLE); -- define schema
   
-INSERT INTO students VALUES (1, "Yve", 1.0);
+INSERT INTO students VALUES (1, "Yve", 1.0); -- insert rows
 INSERT INTO students VALUES (2, "Omar", 2.5);
 INSERT INTO students VALUES (3, "Elia", 3.3);
 
-INSERT INTO students
+INSERT INTO students -- a different way of inserting rows
 VALUES 
   (4, "Ted", 4.7),
   (5, "Tiffany", 5.5),
   (6, "Vini", 6.3);
   
-UPDATE students 
+UPDATE students  -- update rows where student name starts with "T"
 SET value = value + 1
 WHERE name LIKE "T%";
 
-DELETE FROM students 
+DELETE FROM students -- remove rows where "value" is more than 6
 WHERE value > 6;
 
-CREATE OR REPLACE TEMP VIEW updates(id, name, value, type) AS VALUES
+CREATE OR REPLACE TEMP VIEW updates(id, name, value, type) AS VALUES -- create temp view "updates"
   (2, "Omar", 15.2, "update"),
   (3, "", null, "delete"),
   (7, "Blue", 7.7, "insert"),
   (11, "Diya", 8.8, "update");
   
-MERGE INTO students b
+MERGE INTO students b -- merge 'updates' view into 'students' table, with cases for update, delete, and insert
 USING updates u
 ON b.id=u.id
 WHEN MATCHED AND u.type = "update"
@@ -332,7 +332,7 @@ RESTORE TABLE students TO VERSION AS OF 8
 
 -- COMMAND ----------
 
--- VACUUM students RETAIN 0 HOURS
+VACUUM students RETAIN 0 HOURS
 
 -- COMMAND ----------
 

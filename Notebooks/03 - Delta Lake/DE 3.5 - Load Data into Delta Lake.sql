@@ -61,6 +61,10 @@ SELECT * FROM parquet.`${da.paths.datasets}/ecommerce/raw/events-historical`
 
 -- COMMAND ----------
 
+SELECT * FROM events
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC

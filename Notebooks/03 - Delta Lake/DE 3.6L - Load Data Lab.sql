@@ -64,7 +64,13 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN>
+CREATE OR REPLACE TEMP VIEW events_raw_vw 
+  (key BINARY, offset LONG, partition INT, timestamp LONG,
+  topic STRING, value BINARY)
+USING JSON;
+
+CREATE TABLE events_raw AS
+SELECT * FROM events_raw_vw
 
 -- COMMAND ----------
 
@@ -103,7 +109,8 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN>
+INSERT INTO events_raw
+  SELECT * FROM events_json
 
 -- COMMAND ----------
 
@@ -115,7 +122,7 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN>
+SELECT * from events_raw
 
 -- COMMAND ----------
 
@@ -154,7 +161,8 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN> ${da.paths.datasets}/ecommerce/raw/item-lookup
+CREATE TABLE item_lookup AS
+SELECT * FROM parquet.`${da.paths.datasets}/ecommerce/raw/item-lookup`
 
 -- COMMAND ----------
 

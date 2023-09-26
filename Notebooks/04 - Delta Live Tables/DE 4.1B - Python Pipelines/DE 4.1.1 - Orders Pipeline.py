@@ -154,7 +154,7 @@ def orders_bronze():
 # MAGIC DLT uses simple boolean statements to allow quality enforcement checks on data. In the statement below, we:
 # MAGIC * Declare a constraint named **`valid_date`**
 # MAGIC * Define the conditional check that the field **`order_timestamp`** must contain a value greater than January 1, 2021
-# MAGIC * Instruct DLT to fail the current transaction if any records violate the constraint by using the decorator **`@dlt.expect_of_fail()`**
+# MAGIC * Instruct DLT to fail the current transaction if any records violate the constraint by using the decorator **`@dlt.expect_or_fail()`**
 # MAGIC
 # MAGIC Each constraint can have multiple conditions, and multiple constraints can be set for a single table. In addition to failing the update, constraint violation can also automatically drop records or just record the number of violations while still processing these invalid records.
 # MAGIC
